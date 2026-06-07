@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VeterinarianRepository extends JpaRepository<Veterinarian, Long> {
@@ -24,4 +25,16 @@ public interface VeterinarianRepository extends JpaRepository<Veterinarian, Long
     """)
     List<Veterinarian> searchByFullName(@Param(value = "first") String first,
                                   @Param(value = "last") String last);
+
+    @Query("""
+        SELECT v FROM Veterinarian v
+        LEFT JOIN FETCH v.appointments a
+        LEFT JOIN FETCH a.pet p
+        LEFT JOIN FETCH p.owner
+        WHERE v.id = :id
+    """)
+    Optional<Veterinarian> findByIdFetchingSchedule(@Param("id") Long id);
+
+    @Query("SELECT v FROM Veterinarian v LEFT JOIN FETCH v.appointments WHERE v.id = :id")
+    Optional<Veterinarian> findByIdFetchingAppointments(@Param("id") Long id);
 }

@@ -37,7 +37,7 @@ public class Person extends PetOwner {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "person_roles", joinColumns = @JoinColumn(name = "person_id"))
     @Column(name = "role")
@@ -246,6 +246,11 @@ public class Person extends PetOwner {
             throw new IllegalStateException("Person is not an individual client");
         }
         return super.getPets();
+    }
+
+    @Override
+    public String getName() {
+        return firstName + " " + lastName;
     }
 
     public boolean isIndividualClient() {

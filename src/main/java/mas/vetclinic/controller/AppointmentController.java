@@ -6,6 +6,7 @@ import mas.vetclinic.model.entity.appointment.AppointmentDuration;
 import mas.vetclinic.model.entity.person.Veterinarian;
 import mas.vetclinic.service.AppointmentService;
 import mas.vetclinic.service.VeterinarianService;
+import mas.vetclinic.view.BookedSlot;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +44,7 @@ public class AppointmentController {
 
     @GetMapping("/veterinarians/{veterinarianId}/booked-slots")
     @ResponseBody
-    public List<AppointmentService.BookedSlot> bookedSlots(
+    public List<BookedSlot> bookedSlots(
             @PathVariable Long veterinarianId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return appointmentService.getBookedSlots(veterinarianId, date);
@@ -57,9 +58,10 @@ public class AppointmentController {
                          @RequestParam AppointmentDuration duration,
                          Model model, HttpServletResponse response) {
         LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
-        Appointment appointment = appointmentService.scheduleAppointment(veterinarianId, petId, startDateTime, duration);
+        AppointmentService.ScheduledAppointment scheduleAppointment = appointmentService
+                .scheduleAppointment(veterinarianId, petId, startDateTime, duration);
 
-        response.setHeader("X-Owner-Email", appointment.getPet().getOwner().getEmailAddress());
+        response.setHeader("X-Owner-Email", scheduleAppointment.email());
 
         Veterinarian veterinarian = veterinarianService.findById(veterinarianId)
                 .orElseThrow(() -> new IllegalArgumentException("Veterinarian not found"));

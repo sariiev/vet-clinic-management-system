@@ -27,9 +27,6 @@ public class PetDTO {
     @NotNull
     private Long ownerId;
 
-    @NotBlank
-    private String ownerType;
-
     public String getName() {
         return name;
     }
@@ -76,13 +73,5 @@ public class PetDTO {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
-    }
-
-    public String getOwnerType() {
-        return ownerType;
-    }
-
-    public void setOwnerType(String ownerType) {
-        this.ownerType = ownerType;
     }
 }

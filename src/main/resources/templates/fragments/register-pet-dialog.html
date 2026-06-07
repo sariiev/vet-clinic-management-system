@@ -16,7 +16,6 @@
                   th:attr="hx-post=@{/pets(veterinarianId=${veterinarianId})}"
                   hx-target="#selected-pet-container">
                 <input type="hidden" name="ownerId" th:value="${ownerId}">
-                <input type="hidden" name="ownerType" th:value="${type}">
 
                 <div class="form-row">
                     <label class="form-field">

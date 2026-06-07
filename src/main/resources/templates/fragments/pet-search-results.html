@@ -12,7 +12,7 @@
     th:attr="hx-get=@{/pets/{id}/select(id=${pet.id})}"
     hx-target="#selected-pet-container">
         <div th:text="${pet.name}" class="result-card-title"></div>
-        <div th:text="${pet.species.name + ' ' + pet.gender}" class="result-card-line"></div>
+        <div th:text="${pet.speciesName + ' ' + pet.gender}" class="result-card-line"></div>
         <div th:text="${pet.chipNumber}" class="result-card-line"></div>
         <div th:text="${pet.registrationNumber}" class="result-card-line"></div>
     </div>

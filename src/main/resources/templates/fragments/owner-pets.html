@@ -9,7 +9,7 @@
         <div class="search-row">
             <input type="text" id="owner-pet-search-input" class="search-input" name="query" placeholder="Enter name, registration number or chip number...">
             <button class="btn btn-primary"
-                    th:attr="hx-get=@{/pet-owners/{id}/pets/search(id=${owner.id}, ownerType=${type}, veterinarianId=${veterinarianId})}"
+                    th:attr="hx-get=@{/pet-owners/{id}/pets/search(id=${owner.id}, veterinarianId=${veterinarianId})}"
                     hx-target="#pet-search-results"
                     hx-include="#owner-pet-search-input">Search</button>
         </div>
@@ -19,7 +19,7 @@
 
     <div class="register-actions">
         <button class="btn btn-secondary"
-                th:attr="hx-get=@{/pets/register(ownerId=${owner.id}, ownerType=${type}, veterinarianId=${veterinarianId})}"
+                th:attr="hx-get=@{/pets/register(ownerId=${owner.id}, veterinarianId=${veterinarianId})}"
                 hx-target="#nested-dialog-container">Register new pet</button>
     </div>
 </div>
@@ -42,7 +42,7 @@
              th:attr="hx-get=@{/pets/{id}/select(id=${pet.id})}"
              hx-target="#selected-pet-container">
             <div th:text="${pet.name}" class="result-card-title"></div>
-            <div th:text="${pet.species.name + ' ' + pet.gender}" class="result-card-line"></div>
+            <div th:text="${pet.speciesName + ' ' + pet.gender}" class="result-card-line"></div>
             <div th:text="${pet.chipNumber}" class="result-card-line"></div>
             <div th:text="${pet.registrationNumber}" class="result-card-line"></div>
         </div>

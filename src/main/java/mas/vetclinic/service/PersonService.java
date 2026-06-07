@@ -7,13 +7,14 @@ import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-//@Transactional
+@Transactional(readOnly = true)
 public class PersonService {
     public static final int SEARCH_LIMIT = 10;
 
@@ -23,6 +24,7 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
+    @Transactional
     public Person createIndividualClient(String firstName, String lastName, LocalDate dateOfBirth,
                                          String phoneNumber, String emailAddress) throws IllegalArgumentException {
         if (personRepository.existsByPhoneNumberEquals(phoneNumber)) {
@@ -57,9 +59,5 @@ public class PersonService {
         } else {
             return personRepository.searchBySinglePartOfNameAndRole(parts[0], PersonRole.INDIVIDUAL_CLIENT, limit);
         }
-    }
-
-    public Optional<Person> findIndividualClientById(Long id) {
-        return personRepository.findByIdAndRolesContaining(id, PersonRole.INDIVIDUAL_CLIENT);
     }
 }

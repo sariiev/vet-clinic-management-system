@@ -39,11 +39,11 @@
                 <div class="appointment-card"
                 th:each="appointment : ${day.appointments}">
                     <div
-                    th:text="${#temporals.format(appointment.startDateTime, 'HH:mm') + ' - ' + #temporals.format(appointment.expectedEndDateTime, 'HH:mm')}"></div>
+                    th:text="${#temporals.format(appointment.startDateTime, 'HH:mm') + ' - ' + #temporals.format(appointment.endDateTime, 'HH:mm')}"></div>
                     <div
-                    th:text="${appointment.pet.name}"></div>
+                    th:text="${appointment.petName}"></div>
                     <div
-                         th:text="${appointment.pet.owner instanceof T(mas.vetclinic.model.entity.person.Person) ? appointment.pet.owner.firstName + ' ' + appointment.pet.owner.lastName : appointment.pet.owner.name}"></div>
+                         th:text="${appointment.ownerName}"></div>
                 </div>
             </div>
         </div>

@@ -18,7 +18,7 @@ public class Shelter extends PetOwner {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "shelter_phones", joinColumns = @JoinColumn(name = "shelter_id"))
     @Column(name = "phone_number", unique = true)
     private Set<String> phoneNumbers = new HashSet<>();

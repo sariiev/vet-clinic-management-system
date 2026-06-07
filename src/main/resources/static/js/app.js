@@ -97,7 +97,7 @@ document.body.addEventListener('htmx:afterSwap', function (event) {
     }
 
     if (target && target.id === 'dialog-container') {
-        showStep('step-search')
+        showStep('step-search');
         const calendar = document.getElementById('calendar');
         if (calendar && !calendar._flatpickr) {
             flatpickr(
@@ -113,6 +113,7 @@ document.body.addEventListener('htmx:afterSwap', function (event) {
                 }
             )
         }
+        populateStartTimes();
     }
     if (target && target.id === 'owner-pets-container') {
         document.getElementById('nested-dialog-container').innerHTML = '';
@@ -252,6 +253,11 @@ function validateInterval() {
     const startMinute = timeToMinutes(startTime);
     const expectedEndMinute = startMinute + durationMinutes;
 
+    if (startMinute % 15 !== 0) {
+        error.textContent = 'Time must be in 15-minute steps (:00, :15, :30, :45)';
+        return;
+    }
+
     if (startMinute < workingHoursStartMinute || expectedEndMinute > workingHoursEndMinute) {
         error.textContent = `Appointment must be within working hours(${workingHoursStart} - ${workingHoursEnd})`;
         return;
@@ -332,7 +338,25 @@ function showNotification(title, text) {
     const container = document.getElementById('notification-container');
     const notification = document.createElement('div');
     notification.className = 'notification';
-    notification.innerHTML = `<div><h4>${title}</h4>` + (text ? `<div>${text}</div></div>` : '');
+    notification.innerHTML = `<div><h4>${title}</h4>` + (text ? `<div>${text}</div></div>` : '</div>');
     container.appendChild(notification);
     setTimeout(() => notification.remove(), 5000);
+}
+
+function populateStartTimes() {
+    const select = document.getElementById('appointment-start-time');
+    if (!select) {
+        return;
+    }
+
+    const el = document.getElementById('step-schedule');
+    const startM = timeToMinutes(el.dataset.workingHoursStart);
+    const endM = timeToMinutes(el.dataset.workingHoursEnd);
+
+    let options = '<option value="">Select time</option>';
+    for (let m = startM; m <= endM - 15; m += 15) {
+        const t = minutesToTime(m);
+        options += `<option value="${t}">${t}</option>`;
+    }
+    select.innerHTML = options;
 }

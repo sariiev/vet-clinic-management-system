@@ -6,7 +6,6 @@ import mas.vetclinic.model.entity.pet.Pet;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -71,6 +70,8 @@ public abstract class PetOwner {
     public Set<Pet> getPets() {
         return Collections.unmodifiableSet(pets);
     }
+
+    public abstract String getName();
 
     @Override
     public boolean equals(Object o) {

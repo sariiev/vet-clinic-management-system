@@ -6,6 +6,7 @@ import mas.vetclinic.model.dto.ShelterDTO;
 import mas.vetclinic.model.entity.person.Person;
 import mas.vetclinic.model.entity.person.Shelter;
 import mas.vetclinic.service.PersonService;
+import mas.vetclinic.service.PetService;
 import mas.vetclinic.service.ShelterService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +18,12 @@ import java.util.List;
 public class PetOwnerController {
     private final PersonService personService;
     private final ShelterService shelterService;
+    private final PetService petService;
 
-    public PetOwnerController(PersonService personService, ShelterService shelterService) {
+    public PetOwnerController(PersonService personService, ShelterService shelterService, PetService petService) {
         this.personService = personService;
         this.shelterService = shelterService;
+        this.petService = petService;
     }
 
     @GetMapping("pet-owners/search")
@@ -28,7 +31,7 @@ public class PetOwnerController {
                          @RequestParam Long veterinarianId,
                          Model model) {
         List<Person> individualClients = personService.searchIndividualClientsByNameOrPhoneNumber(query);
-        List<Shelter> shelters = shelterService.searchByName(query);
+        List<Shelter> shelters = shelterService.searchByNameOrPhoneNumber(query);
         model.addAttribute("individualClients", individualClients);
         model.addAttribute("shelters", shelters);
         model.addAttribute("truncated",
@@ -63,9 +66,8 @@ public class PetOwnerController {
                 individualClientDTO.getEmailAddress()
         );
         model.addAttribute("owner", individualClient);
-        model.addAttribute("pets", individualClient.getPets());
+        model.addAttribute("pets", petService.getOwnerPetViews(individualClient.getId()));
         model.addAttribute("petsTruncated", false);
-        model.addAttribute("type", "individual-client");
         model.addAttribute("veterinarianId", veterinarianId);
         return "fragments/owner-pets :: pets";
     }
@@ -80,9 +82,8 @@ public class PetOwnerController {
                 shelterDTO.getPhoneNumbers()
         );
         model.addAttribute("owner", shelter);
-        model.addAttribute("pets", shelter.getPets());
+        model.addAttribute("pets", petService.getOwnerPetViews(shelter.getId()));
         model.addAttribute("petsTruncated", false);
-        model.addAttribute("type", "shelter");
         model.addAttribute("veterinarianId", veterinarianId);
         return "fragments/owner-pets :: pets";
     }

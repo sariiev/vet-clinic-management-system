@@ -22,7 +22,7 @@ public class Medication {
     private String name;
 
     @NotNull(message = "Category cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private MedicationCategory category;
 

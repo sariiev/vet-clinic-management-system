@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,19 +50,19 @@ public class Appointment {
     private AppointmentStatus status = AppointmentStatus.SCHEDULED;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "veterinarian_id", nullable = false)
     private Veterinarian veterinarian;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PerformedProcedure> performedProcedures = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
@@ -95,13 +94,9 @@ public class Appointment {
             throw new IllegalArgumentException("Appointment must be within working hours");
         }
 
-//        boolean veterinarianHasOverlappingAppointments = veterinarian.getAppointments().stream().anyMatch(
-//                appointment -> appointment.overlapsWith(startDateTime, expectedDuration)
-//        );
-//
-//        if (veterinarianHasOverlappingAppointments) {
-//            throw new IllegalArgumentException("Interval overlaps with an existing veterinarian's appointment");
-//        }
+        if (startDateTime.getMinute() % 15 != 0 || startDateTime.getSecond() != 0) {
+            throw new IllegalArgumentException("Appointment time must be in 15-minute steps");
+        }
 
         this.veterinarian = veterinarian;
         this.pet = pet;
@@ -252,16 +247,6 @@ public class Appointment {
     public Payment getPayment() {
         return payment;
     }
-
-//    private void setEndDateTime(LocalDateTime endDateTime) {
-//        if (status == AppointmentStatus.COMPLETED && endDateTime == null) {
-//            throw new IllegalArgumentException("End date and time cannot be set to null if status is \"Completed\"");
-//        }
-//        if (endDateTime != null && endDateTime.isBefore(startDateTime)) {
-//            throw new IllegalArgumentException("End date and time cannot be before start date and time");
-//        }
-//        this.endDateTime = endDateTime;
-//    }
 
     public Set<Prescription> getPrescriptions() {
         return Collections.unmodifiableSet(prescriptions);

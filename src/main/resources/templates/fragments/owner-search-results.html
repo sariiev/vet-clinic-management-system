@@ -16,7 +16,7 @@
 
     <div th:unless="${#lists.isEmpty(individualClients)}" class="result-list">
         <div th:each="individualClient : ${individualClients}" class="result-card"
-        th:attr="hx-get=@{/pet-owners/{id}/pets(id=${individualClient.id}, ownerType='individual-client', veterinarianId=${veterinarianId})}"
+        th:attr="hx-get=@{/pet-owners/{id}/pets(id=${individualClient.id}, veterinarianId=${veterinarianId})}"
              hx-target="#owner-pets-container">
             <div th:text="${individualClient.firstName + ' ' + individualClient.lastName}" class="result-card-title"></div>
             <div th:text="${individualClient.phoneNumber}" class="result-card-line"></div>
@@ -26,7 +26,7 @@
 
     <div th:unless="${#lists.isEmpty(shelters)}" class="result-list">
         <div th:each="shelter : ${shelters}" class="result-card"
-             th:attr="hx-get=@{/pet-owners/{id}/pets(id=${shelter.id}, ownerType='shelter', veterinarianId=${veterinarianId})}"
+             th:attr="hx-get=@{/pet-owners/{id}/pets(id=${shelter.id}, veterinarianId=${veterinarianId})}"
             hx-target="#owner-pets-container">
             <div th:text="${shelter.name}" class="result-card-title"></div>
             <div th:text="${#strings.listJoin(shelter.phoneNumbers.stream().limit(3).toList(), ', ') + (shelter.phoneNumbers.size() > 3 ? ' + ' + (shelter.phoneNumbers.size() - 3) + ' more' : '')}" class="result-card-line"></div>

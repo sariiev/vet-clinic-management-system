@@ -8,6 +8,10 @@ import mas.vetclinic.model.entity.pet.Pet;
 import mas.vetclinic.repository.AppointmentRepository;
 import mas.vetclinic.repository.PetRepository;
 import mas.vetclinic.repository.VeterinarianRepository;
+import mas.vetclinic.view.AppointmentView;
+import mas.vetclinic.view.BookedSlot;
+import mas.vetclinic.view.DaySchedule;
+import mas.vetclinic.view.WeekSchedule;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final VeterinarianRepository veterinarianRepository;
@@ -33,13 +38,15 @@ public class AppointmentService {
     }
 
     @Transactional
-    public Appointment scheduleAppointment(Long veterinarianId, Long petId, LocalDateTime startDateTime,
+    public ScheduledAppointment scheduleAppointment(Long veterinarianId, Long petId, LocalDateTime startDateTime,
                                            AppointmentDuration duration) throws IllegalArgumentException {
-        Veterinarian veterinarian = veterinarianRepository.findById(veterinarianId)
-                .orElseThrow(() -> new IllegalArgumentException("Veterinarian not found"));
+        if (startDateTime.getMinute() % 15 != 0 || startDateTime.getSecond() != 0) {
+            throw new IllegalArgumentException("Appointment time must be in 15-minute steps");
+        }
 
-        Pet pet = petRepository.findById(petId)
-                .orElseThrow(() -> new IllegalArgumentException("Pet not found"));
+        if (startDateTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Appointment cannot be scheduled for the past");
+        }
 
         if (!Appointment.isWithinSchedulingWindow(startDateTime.toLocalDate())) {
             throw new IllegalArgumentException("Appointment cannot be scheduled more than"
@@ -49,6 +56,12 @@ public class AppointmentService {
         if (!Appointment.isWithinWorkingHours(startDateTime.toLocalTime(), duration)) {
             throw new IllegalArgumentException("Appointment must be within working hours");
         }
+
+        Veterinarian veterinarian = veterinarianRepository.findById(veterinarianId)
+                .orElseThrow(() -> new IllegalArgumentException("Veterinarian not found"));
+
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new IllegalArgumentException("Pet not found"));
 
         boolean hasCollision = veterinarian.getAppointments().stream()
                 .anyMatch(a -> a.overlapsWith(startDateTime, duration));
@@ -65,12 +78,13 @@ public class AppointmentService {
                 startDateTime.toString()
         );
 
-        return appointment;
+        return new ScheduledAppointment(appointment, ownerEmail);
     }
 
-    @Transactional(readOnly = true)
+    public record ScheduledAppointment(Appointment appointment, String email) {}
+
     public List<BookedSlot> getBookedSlots(Long veterinarianId, LocalDate date) {
-        Veterinarian veterinarian = veterinarianRepository.findById(veterinarianId)
+        Veterinarian veterinarian = veterinarianRepository.findByIdFetchingAppointments(veterinarianId)
                 .orElseThrow(() -> new IllegalArgumentException("Veterinarian not found"));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -90,11 +104,8 @@ public class AppointmentService {
         return bookedSlots;
     }
 
-    public record BookedSlot(String startTime, String endTime) {}
-
-    @Transactional(readOnly = true)
     public WeekSchedule getWeekSchedule(Long veterinarianId, LocalDate dateInWeek) {
-        Veterinarian veterinarian = veterinarianRepository.findById(veterinarianId)
+        Veterinarian veterinarian = veterinarianRepository.findByIdFetchingSchedule(veterinarianId)
                 .orElseThrow(() -> new IllegalArgumentException("Veterinarian not found"));
 
         LocalDate monday = dateInWeek.minusDays(dateInWeek.getDayOfWeek().getValue() - 1);
@@ -102,18 +113,14 @@ public class AppointmentService {
         List<DaySchedule> days = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
             LocalDate day = monday.plusDays(i);
-            List<Appointment> dayAppointments = veterinarian.getAppointments().stream()
+            List<AppointmentView> dayViews = veterinarian.getAppointments().stream()
                     .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
                     .filter(a -> a.getStartDateTime().toLocalDate().equals(day))
                     .sorted(Comparator.comparing(a -> a.getStartDateTime()))
+                    .map(a -> AppointmentView.of(a))
                     .toList();
-            days.add(new DaySchedule(day, dayAppointments));
+            days.add(new DaySchedule(day, dayViews));
         }
         return new WeekSchedule(monday, monday.plusDays(6), monday.minusWeeks(1), monday.plusWeeks(1), days);
     }
-
-    public record DaySchedule(LocalDate date, List<Appointment> appointments) {}
-
-    public record WeekSchedule(LocalDate monday, LocalDate sunday,
-                               LocalDate previousWeek, LocalDate nextWeek, List<DaySchedule> days) {}
 }

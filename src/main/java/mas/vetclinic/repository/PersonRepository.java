@@ -34,7 +34,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
                                          @Param(value = "role") PersonRole role,
                                          Limit limit);
 
-    Optional<Person> findByIdAndRolesContaining(Long id, PersonRole role);
     boolean existsByPhoneNumberEquals(String phoneNumber);
     Optional<Person> findByPhoneNumber(String phoneNumber);
 }

@@ -42,12 +42,12 @@ public class Pet {
     private String chipNumber;
 
     @NotNull(message = "Species cannot be null")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "species_id", nullable = false)
     private Species species;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
     private PetOwner owner;
 
     @OneToMany(mappedBy = "pet", cascade = CascadeType.REMOVE, orphanRemoval = true)
