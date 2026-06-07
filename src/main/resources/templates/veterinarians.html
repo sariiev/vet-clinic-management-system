@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Veterinary Clinic System</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="/js/app.js" defer></script>
+</head>
+<body>
+
+<header class="app-header">
+    <h1>Veterinary Clinic System</h1>
+</header>
+
+<div class="app-body">
+    <aside class="sidebar">
+        <div class="search-row">
+            <input type="text" id="veterinarian-search-input" name="query"
+            class="search-input" placeholder="Enter name...">
+            <button class="btn btn-primary"
+            th:attr="hx-get=@{/veterinarians/search}"
+            hx-include="#veterinarian-search-input"
+            hx-target="#veterinarian-search-results-container">Search</button>
+        </div>
+
+        <div id="veterinarian-search-results-container"
+        th:insert="~{fragments/veterinarian-search-results :: results}"></div>
+    </aside>
+
+    <section id="schedule-container">
+        <h2>No veterinarian selected</h2>
+        <h3>Select a veterinarian from the list to view their schedule</h3>
+    </section>
+</div>
+
+<div id="dialog-container"></div>
+
+<div id="nested-dialog-container"></div>
+
+<div id="notification-container"></div>
+
+</body>
+</html>

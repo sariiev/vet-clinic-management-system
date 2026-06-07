@@ -40,13 +40,13 @@ public abstract class Payment {
         if (appointment.getStatus() != AppointmentStatus.COMPLETED) {
             throw new IllegalArgumentException("Payment cannot be created for an appointment which status is not \"Completed\"");
         }
-        this.appointment = appointment;
         if (dateTime == null) {
             throw new IllegalArgumentException("Date and time cannot be null");
         }
         if (dateTime.isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("Date and time cannot be in the future");
         }
+        this.appointment = appointment;
         this.dateTime = dateTime;
         this.amount = appointment.calculateTotalPrice();
     }
@@ -74,7 +74,7 @@ public abstract class Payment {
             return true;
         }
         if (!(o instanceof Payment that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

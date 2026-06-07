@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="dialog">
+    <div class="modal-overlay" id="nested-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Register new individual client</h2>
+                <div class="modal-subtitle">Add a new individual client to the system</div>
+            </div>
+
+            <form class="modal-body register-form"
+            th:attr="hx-post=@{/individual-clients(veterinarianId=${veterinarianId})}"
+            hx-target="#owner-pets-container">
+                <div class="form-row">
+                    <label class="form-field">
+                        First name *
+                        <input type="text" name="firstName" required>
+                    </label>
+                    <label class="form-field">
+                        Last name *
+                        <input type="text" name="lastName" required>
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label class="form-field">
+                        Date of birth *
+                        <input type="date" name="dateOfBirth" required>
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label class="form-field">
+                        Phone number *
+                        <input type="text" name="phoneNumber" required>
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label class="form-field">
+                        Email *
+                        <input type="email" name="emailAddress" required>
+                    </label>
+                </div>
+
+                <div id="register-error" style="color: red;"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-nested-button">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="confirm-nested-button">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

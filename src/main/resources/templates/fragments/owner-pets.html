@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="pets">
+    <div id="owner-pet-search-panel" class="search-panel">
+        <div class="search-row">
+            <input type="text" id="owner-pet-search-input" class="search-input" name="query" placeholder="Enter name, registration number or chip number...">
+            <button class="btn btn-primary"
+                    th:attr="hx-get=@{/pet-owners/{id}/pets/search(id=${owner.id}, ownerType=${type}, veterinarianId=${veterinarianId})}"
+                    hx-target="#pet-search-results"
+                    hx-include="#owner-pet-search-input">Search</button>
+        </div>
+    </div>
+
+    <div id="pet-search-results" th:insert="~{fragments/owner-pets :: petList}"></div>
+
+    <div class="register-actions">
+        <button class="btn btn-secondary"
+                th:attr="hx-get=@{/pets/register(ownerId=${owner.id}, ownerType=${type}, veterinarianId=${veterinarianId})}"
+                hx-target="#nested-dialog-container">Register new pet</button>
+    </div>
+</div>
+
+<div th:fragment="petList">
+    <div class="result-count"
+         th:if="${#lists.isEmpty(pets)}">
+        No pets found
+    </div>
+
+    <div class="result-count"
+         th:unless="${#lists.isEmpty(pets) || petsTruncated}"
+         th:text="${#lists.size(pets) + ' ' + 'pet(s) found'}"></div>
+    <div class="result-count"
+         th:if="${petsTruncated}"
+         th:text="${'Showing first ' + #lists.size(pets) + ' ' + ' pet(s)'}"></div>
+
+    <div class="result-list">
+        <div th:each="pet : ${pets}" class="result-card"
+             th:attr="hx-get=@{/pets/{id}/select(id=${pet.id})}"
+             hx-target="#selected-pet-container">
+            <div th:text="${pet.name}" class="result-card-title"></div>
+            <div th:text="${pet.species.name + ' ' + pet.gender}" class="result-card-line"></div>
+            <div th:text="${pet.chipNumber}" class="result-card-line"></div>
+            <div th:text="${pet.registrationNumber}" class="result-card-line"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

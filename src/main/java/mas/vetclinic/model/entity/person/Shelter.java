@@ -26,14 +26,14 @@ public class Shelter extends PetOwner {
     protected Shelter() {}
 
     public Shelter(String name, String emailAddress, Set<String> phoneNumbers) throws IllegalArgumentException {
-        setName(name);
-        setEmailAddress(emailAddress);
         if (phoneNumbers == null || phoneNumbers.isEmpty()) {
             throw new IllegalArgumentException("Phone numbers cannot be null or empty");
         }
         for (String phoneNumber : phoneNumbers) {
             addPhoneNumber(phoneNumber);
         }
+        setName(name);
+        setEmailAddress(emailAddress);
     }
 
     // Associations-related methods
@@ -71,21 +71,6 @@ public class Shelter extends PetOwner {
     public void removePhoneNumber(String phoneNumber) {
         phoneNumbers.remove(phoneNumber);
     }
-
-    // Other methods
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) {
-//            return true;
-//        }
-//        if (!(o instanceof Shelter that)) return false;
-//        return Objects.equals(getId(), that.getId());
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return getClass().hashCode();
-//    }
 
     @Override
     public String toString() {

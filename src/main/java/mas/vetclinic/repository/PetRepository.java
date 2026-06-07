@@ -1,4 +1,4 @@
-package mas.vetclinic.model.entity.repository;
+package mas.vetclinic.repository;
 
 import mas.vetclinic.model.entity.pet.Pet;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
+    boolean existsByChipNumberEquals(String chipNumber);
     Optional<Pet> findByRegistrationNumber(String registrationNumber);
     Optional<Pet> findByChipNumber(String chipNumber);
     List<Pet> findByNameContainingIgnoreCase(String name);

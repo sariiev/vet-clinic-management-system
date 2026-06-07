@@ -116,8 +116,9 @@ public class Specialization {
             return true;
         }
         if (!(o instanceof Specialization that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
+
 
     @Override
     public int hashCode() {

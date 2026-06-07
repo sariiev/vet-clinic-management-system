@@ -45,7 +45,7 @@ public class Veterinarian extends Person {
     )
     private Set<Specialization> specializations = new HashSet<>();
 
-    @OneToMany(mappedBy = "veterinarian")
+    @OneToMany(mappedBy = "veterinarian", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Appointment> appointments = new HashSet<>();
 
     protected Veterinarian() {}

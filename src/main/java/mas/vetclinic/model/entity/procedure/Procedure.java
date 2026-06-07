@@ -186,7 +186,7 @@ public class Procedure {
             return true;
         }
         if (!(o instanceof Procedure that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

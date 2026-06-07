@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="dialog">
+    <div class="modal-overlay" id="nested-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Register new shelter</h2>
+                <div class="modal-subtitle">Add a new shelter to the system</div>
+            </div>
+
+            <form class="modal-body register-form"
+                  th:attr="hx-post=@{/shelters(veterinarianId=${veterinarianId})}"
+                  hx-target="#owner-pets-container">
+                <div class="form-row">
+                    <label class="form-field">
+                        Name *
+                        <input type="text" name="name" required>
+                    </label>
+                </div>
+                <div class="form-row">
+                    <label class="form-field">
+                        Email *
+                        <input type="email" name="emailAddress" required>
+                    </label>
+                </div>
+                <label class="form-field">Phone numbers * (at least one required)</label>
+                <div id="phone-numbers">
+                    <div class="phone-row">
+                        <input type="text" name="phoneNumbers" required>
+                        <button type="button" class="btn btn-secondary js-remove-phone">-</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" id="add-phone">+ Add phone number</button>
+
+                <div id="register-error" style="color: red;"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-nested-button">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="confirm-nested-button">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

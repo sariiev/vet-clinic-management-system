@@ -69,7 +69,7 @@ public class Species {
             return true;
         }
         if (!(o instanceof Species that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

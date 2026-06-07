@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="results">
+    <div th:if="${#lists.isEmpty(veterinarians)}">
+        No veterinarians found
+    </div>
+    <div th:unless="${#lists.isEmpty(veterinarians)}" class="result-list">
+        <div th:each="veterinarian : ${veterinarians}" class="result-card"
+             th:attr="data-veterinarian-id=${veterinarian.id}, hx-get=@{/veterinarians/{id}/schedule(id=${veterinarian.id})}"
+             hx-target="#schedule-container">
+            <div th:text="${veterinarian.firstName + ' ' + veterinarian.lastName}" class="result-card-title"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

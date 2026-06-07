@@ -2,6 +2,7 @@ package mas.vetclinic.model.entity.person;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import mas.vetclinic.model.entity.payment.Payment;
 import mas.vetclinic.model.entity.pet.Pet;
 
 import java.math.BigDecimal;
@@ -13,7 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Person extends PetOwner {
     private static final int MINIMUM_AGE = 18;
     private static final String PHONE_REGEX = "^\\+\\d{7,15}$";
@@ -62,7 +62,7 @@ public class Person extends PetOwner {
         setEmailAddress(emailAddress);
     }
 
-    public Person(String firstName, String lastName, LocalDate dateOfBirth, String phoneNumber, LocalDate hireDate, String hourlyRate) throws IllegalArgumentException {
+    protected Person(String firstName, String lastName, LocalDate dateOfBirth, String phoneNumber, LocalDate hireDate, String hourlyRate) throws IllegalArgumentException {
         setFirstName(firstName);
         setLastName(lastName);
         setDateOfBirth(dateOfBirth);
@@ -72,7 +72,7 @@ public class Person extends PetOwner {
         setHourlyRate(hourlyRate);
     }
 
-    public Person(String firstName, String lastName, LocalDate dateOfBirth, String phoneNumber, LocalDate hireDate, String hourlyRate, String emailAddress) throws IllegalArgumentException {
+    protected Person(String firstName, String lastName, LocalDate dateOfBirth, String phoneNumber, LocalDate hireDate, String hourlyRate, String emailAddress) throws IllegalArgumentException {
         setFirstName(firstName);
         setLastName(lastName);
         setDateOfBirth(dateOfBirth);
@@ -255,21 +255,6 @@ public class Person extends PetOwner {
     public boolean isEmployee() {
         return roles.contains(PersonRole.EMPLOYEE);
     }
-
-    // Other methods
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) {
-//            return true;
-//        }
-//        if (!(o instanceof Person that)) return false;
-//        return Objects.equals(getId(), that.getId());
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return 13;
-//    }
 
     @Override
     public String toString() {

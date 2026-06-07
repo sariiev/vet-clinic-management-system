@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="dialog">
+    <div class="modal-overlay" id="base-overlay" th:attr="data-veterinarian-id=${veterinarian.id}">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 th:text="${'Schedule appointment — ' + veterinarian.firstName + ' ' + veterinarian.lastName}"></h2>
+                <div id="modal-subtitle" class="modal-subtitle">Find the pet owner</div>
+            </div>
+            <div class="modal-body">
+                <div id="step-search">
+                    <div class="segmented">
+                        <button class="segmented-option active"
+                        data-target="owner-search-panel">Search by pet owner</button>
+                        <button class="segmented-option"
+                        data-target="pet-search-panel">Search by pet</button>
+                    </div>
+
+                    <div id="owner-search-panel" class="search-panel">
+                        <div class="search-row">
+                            <input type="text" id="owner-search-input" class="search-input" name="query" placeholder="Enter name or phone number...">
+                            <button class="btn btn-primary"
+                            th:attr="hx-get=@{/pet-owners/search(veterinarianId=${veterinarian.id})}"
+                            hx-target="#search-results-container"
+                            hx-include="#owner-search-input">Search</button>
+                        </div>
+                    </div>
+
+                    <div id="pet-search-panel" class="search-panel" style="display: none;">
+                        <div class="search-row">
+                            <input type="text" id="pet-search-input" class="search-input" name="query" placeholder="Enter registration number or chip number...">
+                            <button class="btn btn-primary"
+                                    th:attr="hx-get=@{/pets/search(veterinarianId=${veterinarian.id})}"
+                                    hx-target="#search-results-container"
+                                    hx-include="#pet-search-input">Search</button>
+                        </div>
+                    </div>
+
+                    <div id="search-results-container"></div>
+
+                    <div class="register-actions" id="register-actions">
+                        <button class="btn btn-secondary"
+                                th:attr="hx-get=@{/individual-clients/register(veterinarianId=${veterinarian.id})}"
+                                hx-target="#nested-dialog-container">Register new individual client</button>
+                        <button class="btn btn-secondary"
+                                th:attr="hx-get=@{/shelters/register(veterinarianId=${veterinarian.id})}"
+                                hx-target="#nested-dialog-container">Register new shelter</button>
+                    </div>
+                </div>
+
+                <div id="step-pets" style="display: none;">
+                    <div id="owner-pets-container"></div>
+                </div>
+
+                <div id="step-schedule" style="display: none;"
+                th:attr="data-working-hours-start=${workingHoursStart}, data-working-hours-end=${workingHoursEnd}">
+                    <div id="selected-pet-container"></div>
+                    <div id="calendar" th:attr="data-min-date=${today}, data-max-date=${maxDate}"></div>
+                    <input type="hidden" id="selected-date">
+
+                    <div id="day-section" style="display: none;">
+                        <h3>Existing appointments</h3>
+                        <div id="day-schedule"></div>
+
+                        <div class="form-row">
+                            <label class="form-field">Start time
+                                <input type="time" id="appointment-start-time">
+                            </label>
+
+                            <label class="form-field">Expected duration
+                                <select name="" id="appointment-duration">
+                                    <option value="">Select duration</option>
+                                    <option th:each="duration : ${durations}"
+                                            th:text="${duration.name}"
+                                            th:value="${duration.name()}"
+                                            th:attr="data-duration-minutes=${duration.duration.toMinutes()}"></option>
+                                </select>
+                            </label>
+                        </div>
+
+
+                        <div id="availability"></div>
+                        <div id="scheduling-error" style="color: red;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-button" class="btn btn-secondary">Cancel</button>
+                <button id="back-button" class="btn btn-secondary" style="display: none;">Back</button>
+                <button id="confirm-button" class="btn btn-primary" style="display: none;">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

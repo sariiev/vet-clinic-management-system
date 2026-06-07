@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="schedule">
+    <div class="schedule-header">
+        <h3 th:text="${veterinarian.firstName + ' ' + veterinarian.lastName}"></h3>
+        <button class="btn btn-primary"
+        th:attr="hx-get=@{/appointments/dialog(veterinarianId=${veterinarian.id})}"
+        hx-target="#dialog-container">+ Schedule appointment</button>
+    </div>
+
+    <div class="schedule-nav">
+        <button class="btn btn-nav"
+                th:attr="hx-get=@{/veterinarians/{id}/schedule(id=${veterinarian.id}, date=${week.previousWeek})}"
+                hx-target="#schedule-container">&lt;</button>
+        <button class="btn btn-nav"
+                th:attr="hx-get=@{/veterinarians/{id}/schedule(id=${veterinarian.id})}"
+                hx-target="#schedule-container">Today</button>
+        <button class="btn btn-nav"
+                th:attr="hx-get=@{/veterinarians/{id}/schedule(id=${veterinarian.id}, date=${week.nextWeek})}"
+                hx-target="#schedule-container">&gt;</button>
+        <div th:text="${#temporals.format(week.monday, 'MMM dd') + ' - ' + #temporals.format(week.sunday, 'MMM dd, yyyy')}"></div>
+    </div>
+
+    <div class="week-grid">
+        <div class="day-column"
+        th:each="day : ${week.days}">
+            <div class="day-header">
+                <div class="day-name"
+                th:text="${#temporals.format(day.date, 'EEE')}"></div>
+                <div class="day-number"
+                     th:text="${#temporals.format(day.date, 'd')}"></div>
+            </div>
+            <div class="day-body">
+                <div th:if="${#lists.isEmpty(day.appointments)}">No appointments</div>
+                <div class="appointment-card"
+                th:each="appointment : ${day.appointments}">
+                    <div
+                    th:text="${#temporals.format(appointment.startDateTime, 'HH:mm') + ' - ' + #temporals.format(appointment.expectedEndDateTime, 'HH:mm')}"></div>
+                    <div
+                    th:text="${appointment.pet.name}"></div>
+                    <div
+                         th:text="${appointment.pet.owner instanceof T(mas.vetclinic.model.entity.person.Person) ? appointment.pet.owner.firstName + ' ' + appointment.pet.owner.lastName : appointment.pet.owner.name}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -10,7 +10,9 @@ import mas.vetclinic.model.entity.person.Veterinarian;
 import mas.vetclinic.model.entity.pet.Pet;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -19,6 +21,10 @@ import java.util.stream.Collectors;
 
 @Entity
 public class Appointment {
+    private static LocalTime WORKING_HOURS_START = LocalTime.of(10, 0);
+    private static LocalTime WORKING_HOURS_END = LocalTime.of(18, 0);
+    private static int SCHEDULING_WINDOW_SIZE_DAYS = 90;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -70,21 +76,36 @@ public class Appointment {
         if (veterinarian == null) {
             throw new IllegalArgumentException("Veterinarian cannot be null");
         }
-        this.veterinarian = veterinarian;
         if (pet == null) {
             throw new IllegalArgumentException("Pet cannot be null");
         }
-        this.pet = pet;
         if (startDateTime == null) {
             throw new IllegalArgumentException("Start date and time time cannot be null");
         }
         if (startDateTime.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Start date and time cannot be in the past");
         }
-        this.startDateTime = startDateTime;
         if (expectedDuration == null) {
             throw new IllegalArgumentException("Expected duration cannot be null");
         }
+        if(!isWithinSchedulingWindow(startDateTime.toLocalDate())) {
+            throw new IllegalArgumentException("Appointment cannot be scheduled more than " + SCHEDULING_WINDOW_SIZE_DAYS + " days in advance");
+        }
+        if (!isWithinWorkingHours(startDateTime.toLocalTime(), expectedDuration)) {
+            throw new IllegalArgumentException("Appointment must be within working hours");
+        }
+
+//        boolean veterinarianHasOverlappingAppointments = veterinarian.getAppointments().stream().anyMatch(
+//                appointment -> appointment.overlapsWith(startDateTime, expectedDuration)
+//        );
+//
+//        if (veterinarianHasOverlappingAppointments) {
+//            throw new IllegalArgumentException("Interval overlaps with an existing veterinarian's appointment");
+//        }
+
+        this.veterinarian = veterinarian;
+        this.pet = pet;
+        this.startDateTime = startDateTime;
         this.expectedDuration = expectedDuration;
         veterinarian.addAppointmentInternal(this);
         pet.addAppointmentInternal(this);
@@ -141,6 +162,22 @@ public class Appointment {
         }
         return performedProcedures.stream().map(p -> p.getProcedure().getPrice())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public static boolean isWithinSchedulingWindow(LocalDate date) {
+        return !date.isAfter(LocalDate.now().plusDays(SCHEDULING_WINDOW_SIZE_DAYS));
+    }
+
+    public static boolean isWithinWorkingHours(LocalTime startTime, AppointmentDuration appointmentDuration) {
+        LocalTime endTime = startTime.plus(appointmentDuration.getDuration());
+        return !startTime.isBefore(WORKING_HOURS_START) && !endTime.isAfter(WORKING_HOURS_END);
+    }
+
+    public boolean overlapsWith(LocalDateTime startDateTime, AppointmentDuration duration) {
+        if (this.status == AppointmentStatus.CANCELLED) return false;
+        LocalDateTime endDateTime = startDateTime.plus(duration.getDuration());
+        LocalDateTime thisEndDateTime = this.startDateTime.plus(this.expectedDuration.getDuration());
+        return this.startDateTime.isBefore(endDateTime) && thisEndDateTime.isAfter(startDateTime);
     }
 
     // Associations-related methods
@@ -216,18 +253,34 @@ public class Appointment {
         return payment;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
-        if (status == AppointmentStatus.COMPLETED && endDateTime == null) {
-            throw new IllegalArgumentException("End date and time cannot be set to null if status is \"Completed\"");
-        }
-        if (endDateTime != null && endDateTime.isBefore(startDateTime)) {
-            throw new IllegalArgumentException("End date and time cannot be before start date and time");
-        }
-        this.endDateTime = endDateTime;
-    }
+//    private void setEndDateTime(LocalDateTime endDateTime) {
+//        if (status == AppointmentStatus.COMPLETED && endDateTime == null) {
+//            throw new IllegalArgumentException("End date and time cannot be set to null if status is \"Completed\"");
+//        }
+//        if (endDateTime != null && endDateTime.isBefore(startDateTime)) {
+//            throw new IllegalArgumentException("End date and time cannot be before start date and time");
+//        }
+//        this.endDateTime = endDateTime;
+//    }
 
     public Set<Prescription> getPrescriptions() {
         return Collections.unmodifiableSet(prescriptions);
+    }
+
+    public static LocalTime getWorkingHoursStart() {
+        return WORKING_HOURS_START;
+    }
+
+    public static LocalTime getWorkingHoursEnd() {
+        return WORKING_HOURS_END;
+    }
+
+    public static int getSchedulingWindowSizeDays() {
+        return SCHEDULING_WINDOW_SIZE_DAYS;
+    }
+
+    public LocalDateTime getExpectedEndDateTime() {
+        return startDateTime.plus(expectedDuration.getDuration());
     }
 
     // Other methods
@@ -237,7 +290,7 @@ public class Appointment {
             return true;
         }
         if (!(o instanceof Appointment that)) return false;
-        return Objects.equals(id, that.id);
+        return id != null && id.equals(that.id);
     }
 
     @Override

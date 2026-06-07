@@ -68,7 +68,7 @@ public class MedicationCategory {
             return true;
         }
         if (!(o instanceof MedicationCategory that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

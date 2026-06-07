@@ -41,10 +41,19 @@ public class Medication {
     protected Medication() {}
 
     public Medication(String name, MedicationCategory category, MedicationForm form, String description) throws IllegalArgumentException {
-        setName(name);
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be null or blank");
+        }
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
+        if (form == null) {
+            throw new IllegalArgumentException("Form cannot be null");
+        }
+        this.name = name;
+        this.form = form;
+        this.description = description;
         setCategory(category);
-        setForm(form);
-        setDescription(description);
     }
 
     // Associations-related methods
@@ -120,7 +129,7 @@ public class Medication {
             return true;
         }
         if (!(o instanceof Medication that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

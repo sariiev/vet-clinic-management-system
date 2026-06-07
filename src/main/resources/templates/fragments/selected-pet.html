@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="selectedPet">
+    <div class="result-card-title">Pet owner</div>
+    <div class="result-card-line" th:text="${owner instanceof T(mas.vetclinic.model.entity.person.Person) ? owner.firstName + ' ' + owner.lastName : owner.name}"></div>
+    <div class="result-card-title">Pet</div>
+    <div class="result-card-line" th:text="${pet.name}"></div>
+    <input type="hidden" id="selected-pet-id" th:value="${pet.id}">
+</div>
+</body>
+</html>

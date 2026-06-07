@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import mas.vetclinic.model.entity.appointment.Appointment;
+import mas.vetclinic.model.entity.person.Person;
 import mas.vetclinic.model.entity.person.PetOwner;
 
 import java.time.LocalDate;
@@ -49,17 +50,33 @@ public class Pet {
     @JoinColumn(name = "owner_id")
     private PetOwner owner;
 
-    @OneToMany(mappedBy = "pet")
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Appointment> appointments = new HashSet<>();
 
     protected Pet() {}
 
     public Pet(String name, PetGender gender, LocalDate dateOfBirth, String chipNumber, Species species, PetOwner owner) throws IllegalArgumentException {
+        if (name == null || name.isBlank())
+            throw new IllegalArgumentException("Name cannot be null or blank");
+        if (gender == null)
+            throw new IllegalArgumentException("Gender cannot be null");
+        if (dateOfBirth == null)
+            throw new IllegalArgumentException("Date of birth cannot be null");
+        if (dateOfBirth.isAfter(LocalDate.now()))
+            throw new IllegalArgumentException("Date of birth cannot be in the future");
+        if (species == null)
+            throw new IllegalArgumentException("Species cannot be null");
+        if (owner == null)
+            throw new IllegalArgumentException("Owner cannot be null");
+        if (owner instanceof Person person && !person.isIndividualClient()) {
+            throw new IllegalArgumentException("Person must be an individual client to have a pet");
+        }
+
         this.registrationNumber = "PET-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
-        setName(name);
-        setGender(gender);
-        setDateOfBirth(dateOfBirth);
-        setChipNumber(chipNumber);
+        this.name = name;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.chipNumber = (chipNumber == null || chipNumber.isBlank()) ? null : chipNumber;
         setSpecies(species);
         setOwner(owner);
     }
@@ -82,7 +99,10 @@ public class Pet {
 
     public void setOwner(PetOwner owner) throws IllegalArgumentException {
         if (owner == null) {
-            throw new IllegalArgumentException("Pet must have an owner");
+            throw new IllegalArgumentException("Owner cannot be null");
+        }
+        if (owner instanceof Person person && !person.isIndividualClient()) {
+            throw new IllegalArgumentException("Person must be an individual client to have a pet");
         }
         if (this.owner != null) {
             this.owner.removePetInternal(this);
@@ -105,6 +125,10 @@ public class Pet {
     // Getters and setters
     public Long getId() {
         return id;
+    }
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
     }
 
     public String getName() {
@@ -148,7 +172,7 @@ public class Pet {
     }
 
     public void setChipNumber(String chipNumber) {
-        this.chipNumber = chipNumber;
+        this.chipNumber = (chipNumber == null || chipNumber.isBlank()) ? null : chipNumber;
     }
 
     public Species getSpecies() {
@@ -170,7 +194,7 @@ public class Pet {
             return true;
         }
         if (!(o instanceof Pet that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

@@ -156,7 +156,7 @@ public class Prescription {
             return true;
         }
         if (!(o instanceof Prescription that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

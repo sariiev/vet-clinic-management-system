@@ -2,7 +2,6 @@ package mas.vetclinic.model.entity.person;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import mas.vetclinic.model.entity.pet.Pet;
 
 import java.util.Collections;
@@ -17,7 +16,6 @@ public abstract class PetOwner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email address must be valid")
     @Column(nullable = true)
     private String emailAddress;
@@ -80,7 +78,7 @@ public abstract class PetOwner {
             return true;
         }
         if (!(o instanceof PetOwner that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

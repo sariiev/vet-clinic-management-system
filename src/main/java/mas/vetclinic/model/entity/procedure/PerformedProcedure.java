@@ -133,7 +133,7 @@ public class PerformedProcedure {
             return true;
         }
         if (!(o instanceof PerformedProcedure that)) return false;
-        return Objects.equals(getId(), that.getId());
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override

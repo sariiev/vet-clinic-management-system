@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="results">
+    <div th:if="${pet == null}">
+        Pet not found
+    </div>
+    <div th:unless="${pet == null}" class="result-card"
+    th:attr="hx-get=@{/pets/{id}/select(id=${pet.id})}"
+    hx-target="#selected-pet-container">
+        <div th:text="${pet.name}" class="result-card-title"></div>
+        <div th:text="${pet.species.name + ' ' + pet.gender}" class="result-card-line"></div>
+        <div th:text="${pet.chipNumber}" class="result-card-line"></div>
+        <div th:text="${pet.registrationNumber}" class="result-card-line"></div>
+    </div>
+</div>
+</body>
+</html>
